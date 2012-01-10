@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../style.css">
+<title>Programowanie rozproszone w Javie - technologia WS</title>
+</head>
+
+
+<body>
+
+<h1>WS - ćwiczenie trzecie</h1>
+
+<B>Implementacja serwera WS z wykorzystaniem biblioteki CXF</b>
+
+<p>Celem tego ćwiczenia jest stworzenie serwera udostępniającego usługę sieciową z wykorzystaniem biblioteki <a href="http://http://cxf.apache.org/">CXF</a>.</p>
+
+
+<p>Poniższe ćwiczenie wykorzystuje JDK 1.6.</p>
+
+<h2>Stworzenie serwera</h2>
+
+Biblioteka <a href="http://http://cxf.apache.org/">CXF</a> jest aktualnie jednym z najbardziej rozwiniętych projektów wspierających Web Serwisy (oraz Rest Serwisy). Wykorzystamy ją do stworzenia prostego web serwisu, którego zainstalujemy w kontenerze <a href="http://tomcat.apache.org/">tomcat</a>.
+
+W celu uproszczenia zarządzaniem zależnościami niezbędnymi do użycia biblioteki CXF wykorzystamy narzędzie <a href="http://maven.apache.org/">maven</a>. Pozwala on zarządzać całym cyklem życia aplikacji javowej, począwszy od stworzenia projetku, przez zarządzaniem jego zależnościami do budowania finalnego produktu, gotowego do wdrożenia na produkcji.
+
+<p class="command">
+mvn archetype:generate -B -DarchetypeGroupId=org.apache.cxf.archetype -DarchetypeArtifactId=cxf-jaxws-javafirst -DarchetypeVersion=2.5.1 -DgroupId=pl.edu.wszib -DartifactId=first-cxf-ws -Dversion=1.0 -Dpackage=pl.edu.wszib.pwir
+</p>
+
+W rezultacie zostanie stworzony calkowicie działająca aplikacja udostępniająca prosty web serwis. 
+
+Ten projekt może zostać bardzo łatwo zaimportowany do środowiska <a href="http://www.eclipse.org/">Eclipse</a>
+<p class="command">
+  mvn eclipse:eclipse
+</p>
+
+W projekcie znajdują się następujące ważne elementy:
+
+<ul>
+<li>Interfejs oraz implementacja web serwisu
+  <p class="command">
+    src/main/java/pl/edu/wszib/pwir/HelloWorld.java<br />
+    src/main/java/pl/edu/wszib/pwir/HelloWorldImpl.java
+  </p>
+</li>
+<li>Konfiguracja apliakcji internetowej
+  <p class="command">
+    src/main/webapp/WEB-INF/web.xml 
+  </p>
+</li>
+<li>Konfiguracja web serwisu (<a href="http://www.springsource.org">spring</a>)
+  <p class="command">
+    src/main/webapp/WEB-INF/web.xml 
+  </p>
+</li>
+</ul>
+
+Dzięki wykorzystaniu mavena testowanie weryfikowanie oraz budowania aplikacji jest bardzo proste.
+<p class="command">
+  mvn test<br />
+  mvn package
+</p>
+
+W rezultacie budowania projektu powstanie plik:
+<p class="command">
+  target/first-cxf-ws-1.0.war
+</p>
+
+W celu, uruchomienia tak stworzonej aplikacji wystarczy zainstalowac ja w kontenerze tomcat. W tym celu musimy odpowiednio przygotować sobie środowisko:
+<ul>
+  <li>Sciągamy apache tomcat ze strony projektu,
+    <p class="command">
+      wget http://www.apache.net.pl/tomcat/tomcat-7/v7.0.23/bin/apache-tomcat-7.0.23.tar.gz
+    </p>
+  </li>
+  <li>rozpakowywujemy paczke,
+    <p class="command">
+      tar -xvvzf apache-tomcat-7.0.23.tar.gz
+    </p>
+  </li>
+  <li>wgrywamy web serwise do katalogu webapps serwera tomcat,
+    <p class="command">
+      cp target/first-cxf-ws-1.0.war $TOMCAT_HOME/webapps
+    </p>
+  </li>
+  <li>uruchamiamy serwer tomcata
+    <p class="command">
+      $TOMCAT_HOME/bin/startup.sh
+      $TOMCAT_HOME/bin/catalina.sh run
+    </p>
+  </li>
+  <li>ostatecznie możemy przeglądać WSDL serwisu:
+    <p class="command">
+      http://localhost:8080/first-cxf-ws-1.0/HelloWorld?wsdl
+    </p>
+  </li>
+</ul>
+
+<h2>Zadanie</h2>
+<ul>
+  <li>Dodanie dodatkowej metody web serwisu</li>
+  <li>Zaimplementowanie klienta do stworzonego web serwisu</li>  
+  <li>Stworzenie web serwisu rozwiązujące równanie: a*x*x+ b*x +c = 0</li>
+</ul>
+
+<hr />
+
+<i>Marek Kasztelnik</i>
+
+</body>
+</html>
