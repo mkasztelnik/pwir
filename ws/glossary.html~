@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../style.css">
+<title>Programowanie rozproszone w Javie - technologia WS</title>
+</head>
+
+<body>
+
+<h1>Podręczny mini-słowniczek pojęć z zakresu WS i SOAP</h1>
+
+<p><font class=title>Uwaga.</font> Wszystkie opublikowane poniżej
+objaśnienia są natury mało formalnej. Służą one raczej dobremu
+zrozumieniu pojęć niż formułowaniu formalnych i dokładnych definicji.</p>
+
+
+<h2>Remote Procedure Call (RPC)</h2>
+
+<p class=blue-box><i>Remote Procedure Call</i> jest jednym ze sposobów
+(paradygmatów) budowy aplikacji w środowisku rozproszonym i heterogenicznym,
+złożonym z komputerów różnej architektury. Istotą tego modelu jest
+sprowadzenie zagadnienia komunikacji pomiędzy procesami na odległość do
+zwykłego mechanizmu wywoływania procedury. Proces udostępniający taką
+procedurę nazywany jest <i>serwerem</i> natomiast proces ją wywołujący
+jest <i>klientem</i>. Oprogramowanie pośredniczące
+(<i>middleware</i>) typu RPC zazwyczaj dostarcza odpowiednich bibliotek
+i narzędzi, które umożliwiają zdalne wywoływanie procedur czy funkcji.
+Przykładami standardów opierających się na RPC są Sun RPC, CORBA,
+Web Services, DCOM, RMI.
+</p>
+
+
+<h2>Simple Object Access Protocol (SOAP)</h2>
+
+<p class=blue-box> Protokół wywoływania zdalnych zasobów wykorzystujący 
+XML do kodowania wywołań. Najczęściej wykorzystywanym protokołem przesyłania informacji między serwerem a klientem jest protokół HTTP, niemniej jednak istnieje możliwość użycia innych protokołód do transmisji danych (np. JMS).
+</p>
+
+
+<h2>Web Service (WS)</h2>
+<p class=blue-box>Web Service zwany usługą internetową jest to metoda komunikacji między klientem a serwerem z wykorzystaniem szeroko rozumianej sieci komputerowej (np. Internet, Intranet). Główną cechą takiej usługi internetowej jest niezależność od urzytego języka programowania. Jest to osiągnięte dzieki wykorzystaniu formatu XML do kodowania zapytań oraz odpowiedzi usługi. Usługa opisywana jest poprzez WSDL.
+</p>
+
+
+
+<h2><i>Marshalling</i></h2>
+
+<p class=blue-box><i>Marshalling</i> obiektu jest procesem zbliżonym do
+serializacji. Poprzez <i>marshalling</i> rozumie się przekształcenie
+obiektu z postaci w jakiej jest przechowywany w pamięci do
+<b>jakiejkolwiek</b> postaci pozwalającej przechować go poza pamięcią.
+Dla przykładu zapis obiektu w relacyjnej bazie danych także jest procesem
+<i>marshallingu</i>. W tym znaczeniu serializacja jest jednym z rodzajów
+<i>marshallingu</i>.
+</p>
+
+
+
+
+<hr>
+
+<i>Marek Kasztelnik</i>
+
+</body>
+</html>

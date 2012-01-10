@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+
+<body>
+
+         
+<h1>RMI - ćwiczenie piąte</h1>
+       
+<h2>Przykład aplikacji  - serwer z modułami typu <i>plug-in</i></h2>
+
+<p>Przykładem ciekawszej aplikacji wykorzystującej RMI oraz dynamiczne
+ładowanie kodu jest serwer, do którego można dynamicznie ładować
+<i>pluginy</i> i wykonywać w nich obliczenia na wirtualnej maszynie serwera.</p>
+
+         
+<h2>Interfejs Serializable</h2>
+
+<p>Do tej pory korzystaliśmy z interfejsu <font class=title>java.rmi.Remote</font>,
+który umożliwiał wywoływanie zdalnie metod na pewnym obiekcie.
+Jako argumenty tych metod mogły być używane wszystkie proste typy
+języka Java (<b>int</b>, <b>String</b> itp.), również ich tablice.
+</p>
+
+<p>Żeby móc przekazać jako parametr zdalnej metody dowolny obiekt,
+musi on implementować interfejs <font class=title>java.IO.Serializable</font>.
+Wówczas obiekt ten jest przekazywany przez wartość, czyli jego wartość
+jest kopiowana, serializowana (<i>marshalling</i>) i przesyłana przez sieć do
+obiektu, który implementuje metodę (do serwera).
+</p>
+
+<p>Jeżeli parametrem zdalnej metody jest nie klasa, lecz interfejs, wówczas 
+wirtualna maszyna, na której znajduje się serwer, nie musi wcześniej znać 
+definicji obiektu, który otrzyma w czasie działania od klienta. Wystarczy 
+tylko, że obiekt ten implementuje znany interfejs. Oznacza to, że pliki
+<b>.class</b> tego obiektu mogą nie być dostępne w momencie uruchomienia
+serwera. Żeby klient mógł przekazać obiekt nie znany wcześniej w wirtualnej
+maszynie serwera, musi on podać lokalizację, skąd można definicję obiektu
+pobrać. W tym celu ponownie używamy opcji
+</p>
+     
+<p class=command>java.rmi.server.codebase=&lt;URL&gt;</p>
+
+Gdzie <b>&lt;URL&gt;</b> wskazuje na miejsce, z którego można pobrać pliki
+<b>.class</b>. W szczególności możemy skorzystać z protokołu HTTP aby pobrać
+pliki poprzez sieć.
+</p>
+
+
+
+<h2>Aplikacja</h2>
+<a href="plugin.gif">Prosty diagram klas aplikacji.</a>
+
+<p>Potrzebne będą następujące pliki
+   
+<ul>
+<!--    <li><a href="src/plug/AppContainer.java"><b>AppContainer.java</b></a>
+    - definicja interfejsu serwera - kontenera dla pluginów
+-->
+	<li><b>AppContainer.java</b> - definicja interfejsu serwera -
+	kontenera dla pluginów
+    <li><a href="src/plug/Plugin.java"><b>Plugin.java</b></a>
+    - definicja interfejsu pluginu
+<!--    <li><a href="src/plug/AppServer.java"><b>AppServer.java</b></a>
+    - implementacja serwera
+-->
+	<li><b>AppServer.java</b> - implementacja serwera
+    <li><a href="src/plug/FibPlugin.java"><b>FibPlugin.java</b></a>
+    - implementacja przykładowego pluginu liczącego ciąg Fibonacciego
+<!--    <li><a href="src/plug/AppClient.java"><b>AppClient.java</b></a>
+    - implementacja klienta
+-->
+	<li><b>AppClient.java</b> - implementacja klienta
+    <li>I dobrze znany <a href="src/echo/java.policy"><b>java.policy</b></a>
+</ul></p>
+
+<p>Wskazówki przy implementacji klienta:
+<ol>
+	<li>Utworzyć obiekt klasy <b>FibPlugin</b> przekazując do konstruktora
+	numer żądanego wyrazu ciągu Fibonacciego
+	<li>Znaleźć serwer w rejestrze <i>Naming Service</i>
+	<li>Wywołać metodę <b>run</b> serwera przekazując utworzony obiekt
+	pluginu jako parametr wywołania
+</ol></p>
+
+<p>Wskazówki przy implementacji serwera:
+<ol>
+	<li>Metoda <b>main</b> - podobna jak poprzednio
+	<li>W metodzie <b>run</B> wywołać metodę <b>compute</b> otrzymanego
+	Pluginu i wynik jej działania zwrócić klientowi
+</ol></p>
+	
+
+<p>Pliki należy skompilować i utworzyć <i>stub</i> dla klasy
+<b>AppServer</b>.</p>
+
+
+
+<h2>Uruchomienie przykładu</h2>
+
+<p>Należy przetestować działanie programów na dwóch różnych komputerach.
+   
+<ol>
+<li>Na komputerze A działa <b>rmiregistry</b> oraz w osobnym katalogu 
+znajdują się pliki serwera:
+      <ul>
+      <li><b>AppContainer.class</b>
+      <li><b>AppServer_Stub.class</b>
+      <li><b>java.policy</b>
+      <li><b>AppServer.class</b>
+      <li><b>Plugin.class</b>
+      </ul>
+
+<li>Pliki 
+	<ul>
+	<li><b>AppServer_Stub.class</b>
+	<li><b>Plugin.class</b>
+	<li><b>AppContainer.class</b>
+	</ul>
+należy umieścić w katalogu <b>~/../pub/server_classes</b>
+i ustawić odpowiednie prawa dostępu (chmod a+r *). Wówczas <i>codebase</i> dla 
+serwera będzie mieć postać:
+<b>http://artemis.wszib.edu.pl/~userA/server_classes</b>
+
+<li>Należy uruchomić serwer na komputerze A poleceniem
+
+<p class=command>
+java -Djava.rmi.server.codebase="http://artemis.wszib.edu.pl/~userA/server_classes/"
+-Djava.security.policy=java.policy AppServer //hostA/appserver
+</p>
+gdzie <b>hostA</b> to nazwa domenowa komputera A
+
+<li>Na komputerze B muszą być pliki klienta
+	<ul>
+	<li><b>AppClient.class</b>
+	<li><b>AppContainer.class</b>
+	<li><b>FibPlugin.class</b>
+	<li><b>Plugin.class</b>
+	<li><b>java.policy</b>
+	</ul>
+	
+<li> Plik <b>FibPlugin.class</b> należy umieścić w katalogu
+<b>~/../pub/client_classes</b> i ustawić odpowiednie prawa dostępu.
+Wówczas <i>codebase</i> dla klienta będzie mieć postać
+<b>http://artemis.wszib.edu.pl/~userB/client_classes</b>
+
+<li>Uruchomić na komputerze B klienta poleceniem
+<p class=command>
+java -Djava.rmi.server.codebase="http://artemis.wszib.edu.pl/~userB/client_classes/"
+-Djava.security.policy=java.policy AppClient //hostA/appserver 8
+</p>
+To polecenie powinno zwrócić ósmy wyraz ciągu Fibonacciego.
+   
+</ol>
+
+
+<h2>Zadanie</h2>
+Proszę wymyślić i napisać nowy plugin do tego serwera, który będzie
+wykonywał inną operację niż <b>FibPlugin</b>. Ile plików trzeba
+zmienić i rekompilować?<br>
+
+ 
+<hr>
+
+<i>Tomasz Gubała</i>
+
+</body>
+</html>

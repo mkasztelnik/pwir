@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+
+<body>
+
+<h1>RMI - ćwiczenie drugie</h1>
+
+<b>Uruchomienie przykładu Echo na dwóch komputerach</b>
+
+<p>Do ćwiczenia potrzebne są dwa komputery podłączone do sieci. Ćwiczenie jest
+dwuosobowe.</p>
+<ol>
+  <!-- <li>Przy pomocy polecenia <tt>/sbin/ifconfig</tt> znajdujemy numery IP
+komputerów.</li>-->
+  <li>Przy pomocy polecenia <b>hostname</b> znajdujemy nazwy domenowe obu
+  komputerów (jeżeli obie domeny są takie same jako nazwy maszyn wystarczy użyć
+  samej nazwy hosta)
+  <li>Na komputerze A uruchamiamy Naming Service poleceniem <b>rmiregistry</b>
+  <li>Na komputerze A uruchamiamy serwer (np. EchoSerwer) w ten sposób, żeby
+rejestrował się w Naming Service przy użyciu URL zawierającego nazwę komputera
+A (np. <b>//komp0401.dydaktyka.wszib.edu.pl/echoserver</b>). 
+</li>
+  <li>Na komputerze B uruchamiamy klienta w ten sposób, by szukał referencji
+do obiektu serwera przy pomocy URL z numerem IP komputera A (tym samym, co
+w punkcie 3). W ten sposób klient na komputerze B wywoła metodę obiektu znajdującego
+się na komputerze A.</li>
+</ol>
+<!-- Uwaga: Używanie numerów IP zamiast nazw jest konieczne ponieważ (prawie)
+wszystkie komputery w laboratorium mają nazwę <tt>localhost.localdomain</tt>
+i nie da się ich rozróżnić po tej nazwie.-->
+
+
+
+<h2>Uwaga o URL</h2>
+<p>Naming Service (<i>registry</i>) służy do rejestrowania obiektów przy
+pomocy nazw, które posiadają składnię URL (<i>Uniform Resource Locator</i>).
+W ogólności adres taki składa się z nazwy protokołu (tutaj pomijanej),
+nazwy hosta, numeru portu na którym nasłuchuje Naming Service oraz z
+konkretnej nazwy obiektu który jest tam zarejestrowany.
+</p>
+
+<p class=command>
+&nbsp;//host1.wszib.edu.pl/obiekt1<br>
+&nbsp;//217.96.89.130/obiekt2<br>
+&nbsp;//host2.wszib.edu.pl:5446/obiekt3
+</p>
+
+<p>Nazwa hosta i port są opcjonalne. Domyślnym hostem jest komputer lokalny
+(<i>localhost</i>) a domyślny port to 1099. Tak więc przy użyciu RMI na
+jednym komputerze nie musimy dostarczać jego nazwy.
+</p>
+
+<hr>
+
+<i>Tomasz Gubała</i>
+
+</body>
+</html>

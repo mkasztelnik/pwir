@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+
+<body>
+
+<h1>RMI - ćwiczenie pierwsze</h1>
+
+<B>Implementacja klienta i serwera Echo</b>
+
+<p>Celem tego podstawowego ćwiczenia jest zrozumienie sposobu
+projektowania i implementacji prostych aplikacji działających w oparciu
+o technologię <i>RMI</i>. Poszczególne punkty tłumaczą jak zaprojektować
+interfejs obiektu wywoływanego zdalnie, jak zaimplementować
+serwer tego obiektu oraz w jaki sposób łączyć sie z tym serwerem z programu
+klienta RMI.</p>
+
+
+
+<h2>Definicja interfejsów</h2>
+
+<p>Na początku definiujemy interfejs jakiego będzie używał serwer RMI.
+Będzie to bardzo prosta aplikacja <i>odbijająca</i> napis do nadawcy.</p>
+
+<p>Metody, które mogą być wywoływane zdalnie, należy zdefiniować
+w interfejsie dziedziczącym z interfejsu (rozszerzającym
+interfejs) <font class=title>java.rmi.Remote</font>. Co więcej, każda z tych metod
+musi zgłaszać wyjątek <font class=title>java.rmi.RemoteException</font>
+z uwagi na fakt, że jej wywołanie następuje zdalnie.</p>
+
+<p class=command>
+public interface Echo extends <b>Remote</b> {<br>
+&nbsp;&nbsp;String reply(String s) throws <b>RemoteException</b>;<br>
+}
+</p>
+
+<p>Kompletny plik z definicją interfejsu:
+<a href="src/echo/Echo.java">Echo.java</a>.</p>
+
+
+
+<h2>Implementacja serwera Echo</h2>
+
+<p>
+W czasie implementacji serwera w technologii RMI należy pamiętać
+o następujących warunkach:
+<ol>
+<li>Klasa serwera musi implementować zdefiniowany wyżej interfejs
+oraz dziedziczyć z klasy
+<font class=title>java.rmi.server.UnicastRemoteObject</font>
+
+<p class=command>
+public class EchoServer extends <b>UnicastRemoteObject</b> implements Echo
+</p>
+
+<li>Konieczny jest konstruktor, nawet jeżeli nie wykonuje on niczego,
+ze względu na wspomnianą deklarację zgłaszania wyjątku
+
+<p class=command>
+public EchoServer() <b>throws RemoteException</b> {<br>
+}
+</p>
+
+<li>Następnie należy zaimplementować metodę zadeklarowaną w interfejsie.
+Ponieważ ma być to <i>echo</i>, dlatego metoda po prostu zwraca bez zmian
+to, co otrzymała jako argument. Aby potwierdzic fakt wywołania metody
+wypisujemy komunikat
+
+<p class=command>
+public String reply(String s) {<br>
+&nbsp;&nbsp;System.out.println("EchoServer: odebrana wiadomosc "+s);
+&nbsp;&nbsp;return s;<br>
+}
+</p>
+
+<li>Na początku metody <b>main()</b> musimy utworzyć obiekt
+<b>SecurityManager</b>, który będzie decydował, jakie uprawnienia
+będzie miała aplikacja, która jest dostępna z zewnątrz. W przypadku
+RMI dobrze jest skorzystać z poręcznego
+<font class=title>java.rmi.RMISecurityManager</font>
+
+<p class=command>
+public static void main(String[] args) {<br>
+&nbsp;&nbsp;System.setSecurityManager(new RMISecurityManager());<br>
+...
+</p>
+
+<li>Po utworzeniu obiektu serwera, musimy go wpisac do rejestru
+(w Javie nazywanego <i>Naming Service</i>). Obiekt w rejestrze
+zawsze figuruje pod pewną nazwą - podajemy ją w tym wypadku w linii
+poleceń. Pod taką nazwą klient będzie mógł uzyskać referencję do
+obiektu serwera. Obiekt <font class=title>java.rmi.Naming</font>
+w poniższym przykładzie jest obiektem statycznym i oznacza rejestr
+znajdujący się na tym samym komputerze, co aplikacja.
+
+<p class=command>
+String name = args[0];<br>
+try {<br>
+&nbsp;&nbsp;EchoServer server = new EchoServer();<br>
+&nbsp;&nbsp;Naming.<b>rebind</b>(name, server);<br>
+&nbsp;&nbsp;System.out.println("EchoServer: zarejestrowalem sie");<br>
+} catch (Exception e) {<br>
+&nbsp;&nbsp;System.err.println("EchoServer wyjatek: " + e.getMessage());<br>
+&nbsp;&nbsp;e.printStackTrace();<br>
+}
+</p>            
+</ol></p>
+
+<p>Kompletny plik z implementacją serwera Echo:
+<a href="src/echo/EchoServer.java">EchoServer.java</a>.</p>
+
+
+
+<h2>Implementacja klienta Echo</h2>
+
+<p>W implementacji klienta trzeba wykonać następujące czynności:
+<ol>
+<li>Podobnie jak w przypadku serwera zaraz na początku metody <b>main()</b>
+powołujemy do życia obiekt <b>RMISecurityManager</b>
+
+<li>Wywołujemy metodę <b>lookup</b> aby uzyskać z rejestru referencję
+do obiektu serwera na podstawie nazwy (nazwę tę przekazujemy do programu
+klienta także z linii komend). Metoda ta zwraca nam <i>zdalną referencję</i>
+do obiektu serwera, którą możemy zrzutować na interfejs <b>Echo</b> (gdyż
+wiemy że serwer implementuje ten interfejs). Termin <i>zdalna referencja</i>
+fizycznie oznacza zwykłą, lokalną referencję, ale nie do samego obiektu
+serwera (który wszak znajduje sie na odległej maszynie) a do instancji <i>stub</i>
+serwera. Jak wiemy, stub serwera musi implementować ten sam interfejs <b>Echo</b>
+(przez co rzutowanie jest możliwe).
+
+<p class=command>
+String name = args[0];<br>
+Echo echo = (Echo) Naming.<b>lookup</b>(name);
+</p>
+
+<li>Następnie możemy już wywołać metodę <b>reply</b> tak, jak zwykłą
+metodę obiektu
+
+<p class=command>
+System.out.println(echo.reply(args[1]));
+</p>            
+
+</ol></p>
+
+<p>Kompletny plik z implementacją klienta Echo:
+<a href="src/echo/EchoClient.java">EchoClient.java</a>.</p>
+
+
+
+<h2>Kompilacja</h2>
+
+<p>Zakładamy, że wszystkie pliki źródłowe mamy w jednym katalogu,
+np. /home/user/rmi/echo.
+<ol>
+<li>Kompilujemy wszystkie trzy pliki źródłowe w zwykły sposób
+
+<p class=command>
+	javac *.java
+</p>
+
+<li>Używamy polecenia <b>rmic</b> do wygenerowania stubu i skeletonu.
+Polecenie to automatycznie wygeneruje pliki <b>EchoServer_Stub.java</b> oraz
+<b>EchoServer_Skeleton.java</b> w tym samym katalogu a następnie pliki te
+skompiluje. Otrzymujemy <b>EchoServer_Stub.class</b> i
+<b>EchoServer_Skeleton.class</b>. Jeżeli chcemy oglądnąć pliki źródłowe
+generowane przez ten kompilator należy użyć opcji <b>-keep</b>.
+<font class=title>Uwaga!</font> Należy pamiętać aby użyć narzędzia z tej
+samej dystrybucji Java SDK z jakiej pochodzi użyty kompilator <b>javac</b>.
+
+<p class=command>
+	<strike>rmic EchoServer</strike><br>
+	readlink javac<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<b>/usr/java/j2sdk1.4.2_10/bin/</b>javac<br>
+	/usr/java/j2sdk1.4.2_10/bin/rmic EchoServer
+</p>
+
+</ol></p>
+
+
+
+<h2>Uruchamianie</h2>
+<ol>
+<li>Przed uruchmieniem serwera należy zdefiniować uprawnienia,
+które będą przysługiwały aplikacji. Ponieważ aplikacja ta ma
+korzystać z sieci, dlatego musi miec prawo do otwierania portów
+(w szczególności portu <b>1099</b> którego domyślnie używa RMI).
+Dodatkowo dostępny port 80 (web server) będzie potrzebny przy kolejnych
+ćwiczeniach dotyczących dynamicznego pobierania klas z sieci.
+Zapisujemy to w pliku <b><a href="src/echo/java.policy">java.policy</a></b>
+w następujący sposób
+
+<p class=command>
+grant {<br>
+&nbsp;&nbsp;permission java.net.SocketPermission "*:1024-65535", "connect,accept";<br>
+&nbsp;&nbsp;permission java.net.SocketPermission "*:80", "connect";<br>
+};
+</p>
+
+<li>W osobnym shellu uruchamiamy Naming Service (rejestr), poleceniem
+
+<p class=command>
+	<strike>rmiregistry</strike><br>
+	readlink javac<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<b>/usr/java/j2sdk1.4.2_10/bin/</b>javac<br>
+	/usr/java/j2sdk1.4.2_10/bin/rmiregistry
+</p>
+
+Uwaga! Jezeli otrzymamy błąd w rodzaju:
+
+<b>java.rmi.server.ExportException: Port already in use: 1099</b>
+
+oznacza to, że rejestr jest już uruchomiony na tym komputerze
+i nie trzeba go powtórnie uruchamiać.
+
+<li>Uruchomienie serwera wykonujemy jako aplikację javy,
+podając dodatkowe opcje
+<ul>
+<li> <b>-Djava.rmi.server.codebase="URL"</b> wskazuje adres URL do miejsca,
+gdzie znajduje się <i>stub</i> obiektu serwera. Jest to informacja potrzebna
+dla rejestru, aby mógł przekazać klientom referencje do serwera.
+URL może mieć postać <i>"file: ..."</i>. W naszym wypadku powinien on wskazywać
+na katalog bieżący (<b>pwd</b>). W szczególności podawanie tej informacji
+może nie być potrzebne, jeżeli rejestr RMI uruchomimy z tego samego
+katalogu w którym znajduje się klasa <b>EchoServer_Stub</b>
+(lub katalog w którym ta klasa się znajduje będzie wymieniony
+w <i>CLASSPATH</i>). <font class=title>Uwaga!</font> Jeżeli URL
+wskazuje na katalog, wówczas musi być zakończony znakiem <b>/</b>
+<li> <b>-Djava.security.policy=java.policy</b> wskazuje plik z uprawnieniami. 
+</ul>
+Jako parametr wywołania podajemy również nazwę, pod jaką chcemy
+zarejestrować nasz obiekt w Name Service (np. echo123)
+
+<p class=command>
+java -Djava.rmi.server.codebase=file:`pwd`/  -Djava.security.policy=java.policy EchoServer echo123
+</p>
+
+<li>W osobnym terminalu (konsoli) wykonujemy aplikację klienta.
+Przekazujemy jej dwa parametry: nazwę, pod jaką zarejestrowany jest
+serwer oraz napis, który ma być przekazany do serwera Echo
+
+<p class=command>
+java -Djava.security.policy=java.policy  EchoClient echo123 HelloWorld!
+</p>
+
+Odpowiedź powinna brzmieć
+
+<p class=command>
+    HelloWorld!
+</p>
+</ol></p>
+
+
+
+<h2>Zadanie</h2>
+
+<p>Proszę dodać do serwera drugą metodę (np. dodawanie dwóch liczb)
+i zaimplementować odpowiedniego klienta.</p>
+
+
+
+<hr>
+
+<i>Tomasz Gubała, Marek Kasztelnik</i>
+
+</body>
+</html>

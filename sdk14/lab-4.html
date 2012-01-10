@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+
+<body>
+
+<h1>RMI - ćwiczenie czwarte</h1>
+
+<B>Automatyczna aktywacja serwera Echo <i>na żądanie</i></b>
+
+<p>Jedną z wad podstawowego zestawienia aplikacji
+w technologii RMI jest konieczność utrzymywania procesu (JVM)
+serwera aplikacji w ciągłym czynnym oczekiwaniu. Serwer taki działa
+bez względu na istnienie zapotrzebowania.</p>
+
+<p>Jedną z nowszych modyfikacji technologii RMI jest dodanie
+możliwości automatycznej aktywacji obiektu serwera kiedy zajdzie
+taka potrzeba (tj. kiedy pojawi się klient chcący wywołać metodę
+serwera).</p>
+
+<p>Celem tego ćwiczenia jest taka modyfikacja znanego serwera Echo
+aby mógł on korzystać z nowej właściwości RMI.</p>
+
+
+<h2>Konieczne zmiany</h2>
+
+<p>W ćwiczeniu wykorzystane będą pliki źródłowe znane z ćwiczeia
+pierwszego. Plik źródłowy serwera będzie musiał ulec modyfikacjom,
+pozostałe pliki pozostają niezmienione. Można je pobrać poniżej:
+<ul>
+  <li><a href="src/echo/Echo.java">Echo.java</a>
+  <li><a href="src/echo/EchoClient.java">EchoClient.java</a>
+  <li><a href="src/echo/java.policy">java.policy</a>
+</ul>
+Jeżeli ktoś nadal dysponuje skompilowanym kodem interfejsu
+(plik <b>Echo.class</b>) oraz klasy klienta (plik <b>EchoClient.class</b>)
+może ich użyć bez konieczności rekompilacji.
+</p>
+
+
+<h2>Modyfikacja klasy serwera</h2>
+
+<p>Aby serwer echo był w stanie wykorzystać technologię
+<i>rmi.activation</i> musi rozszerzać klasę
+<font class=title>java.rmi.activation.Activatable</font></p>
+
+<p class=command>
+public class ActiveEchoServer extends <b>Activatable</b>
+implements Echo
+</p>
+
+
+<p>Modyfikacji musi także ulec konstruktor: tym razem posiada dwa
+parametry wywołania. Pierwszym jest identyfikator obiektu
+aktywowanego, drugi parametr służy do przekazania dodatkowych
+informacji do tworzonego obiektu serwera (serwer echo jest na
+tyle prosty że nie potrzebujemy żadnych dodatkowych obiektów)</p>
+
+<p class=command>
+public ActiveEchoServer() (<b>ActivationID id</b>, MarshalledObject data)<br>
+&nbsp;&nbsp;throws RemoteException {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b>super(id, 0);</b><br>
+}
+</p>
+
+<p>Implementacja metody <b>reply</b> pozostaje bez zmian.</p>
+
+
+
+<h2>Implementacja kodu <i>setup</i></h2>
+
+<p>Najważniejszą różnicą względem wcześniejszej wersji serwera echo
+jest kod który dokonuje samej operacji zarejestrowania klasy
+serwera w demonie <b>rmid</b> oraz określenia warunków w których
+przyszła aktywacja serwera ma nastąpić. Kod ten umieścimy w
+metodzie <b>main</b> serwera, modyfikując poprzednią jej wersję.</p>
+
+<ol>
+
+<li>Demon <b>rmid</b> grupuje zarejestrowane klasy w <i>grupy</i>.
+Wszystkie obiekty z danej grupy są aktywowane w obrębie tej samej JVM
+oraz na tych samych warunkach. Dlatego musimy stworzyć taką grupę.
+W pierwszej kolejności opisujemy warunki aktywacji naszego serwera
+
+<p class=command>
+Properties prop = new Properties();<br>
+prop.put("<b>java.security.policy</b>", "<b>java.policy</b>");<br>
+<b>ActivationGroupDesc</b> grp = new ActivationGroupDesc(prop, null);
+</p>
+
+<p>W tym wypadku upewniamy się, że aktywowany obiekt serwera otrzyma
+jako parametr odpowiedni plik z uprawnieniami (znany już nam z poprzednich
+ćwiczeń).</p>
+
+
+<li>Utworzenie grupy następuje poprzez zarejestrowanie jej w systemie
+<i>Activation</i> poprzez statyczną metodę klasy 
+<font class=title>java.rmi.activation.ActivationGroup</font>
+
+<p class=command>
+ActivationGroupID agid = ActivationGroup.getSystem().<B>registerGroup(grp)</b>;
+</p>
+
+
+<li>Następnie w obrębie stworzonej grupy tworzymy opis wywołania
+naszego serwera echo (m.in. wskazując gdzie znajduje się skompilowany
+kod oraz jak nazywa się klasa serwera). Tak stworzony opis rejestrujemy
+również otrzymując w zamian referencję do stworzonej instancji <i>stub</i>
+serwera - instancję tę możemy z kolei zarejestrować w rejestrze
+<b>rmiregistry</b> gdzie będzie go mógł znaleźć klient
+
+<p class=command>
+ActivationDesc desc = new ActivationDesc<br>
+&nbsp;&nbsp;(<b>agid</b>, "<b>ActiveEchoServer</b>", args[0], null);<br>
+Echo server = (Echo) Activatable.<b>register</b>(desc);
+</p>            
+</ol></p>
+
+<p>Kompletny plik z implementacją nowego serwera Echo:
+<a href="src/active/ActiveEchoServer.java">ActiveEchoServer.java</a>.</p>
+
+
+
+<h2>Kompilacja</h2>
+
+<p>
+<ol>
+<li>Jeżeli mamy gotowe pliki klas interfejsu i klienta, kompilujemy
+sam nowy plik źródłowy
+
+<p class=command>
+	javac ActiveEchoServer.java
+</p>
+
+Jeżeli nie, kompilujemy wszystkie trzy pliki źródłowe jak poprzednio
+
+<p class=command>
+	javac *.java
+</p>
+
+
+<li>Generujemy nowy <i>stub</i> i <i>skeleton</i>.
+<font class=title>Uwaga!</font> Należy pamiętać aby użyć narzędzia z tej
+samej dystrybucji Java SDK z jakiej pochodzi użyty kompilator <b>javac</b>.
+
+<p class=command>
+	<strike>rmic ActiveEchoServer</strike><br>
+	readlink javac<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<b>/usr/java/j2sdk1.4.2_10/bin/</b>javac<br>
+	/usr/java/j2sdk1.4.2_10/bin/rmic ActiveEchoServer
+</p>
+
+</ol></p>
+
+
+
+<h2>Uruchamianie</h2>
+<ol>
+<li>Wykorzystamy poznany wcześniej mechanizm dynamicznego ładowania klas -
+skopiujmy pliki <b>ActiveEchoServer_Stub.class</b> i <b>Echo.class</b> do
+katalogu który jest udostępniany przez Web Server (czyli <i>~/../pub/</i>)
+
+<li>Tak jak poprzednio, aby zmusić rejestr do pobierania pliku <i>Stub</i>
+serwera poprzez sieć uruchamiamy go w <b>innym</b> katalogu niż lokalizacja
+serwera Echo. Najlepiej uruchomić rejestr w tle poleceniem
+
+<p class=command>
+	<strike>rmiregistry</strike><br>
+readlink javac<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<b>/usr/java/j2sdk1.4.2_10/bin/</b>javac<br>
+	/usr/java/j2sdk1.4.2_10/bin/rmiregistry &amp;
+</p>
+
+
+<li>Za poprawne działanie mechanizmu <i>Activation</i> odpowiada
+specjalny demon <b>rmid</b>. Musimy go uruchomić wskazując odpowiedni
+poziom uprawnień na jakim ma uruchamiać instancje serwera
+
+<p class=command>
+rmid -J-Dsun.rmi.activation.<b>execPolicy</b>=none &amp;
+</p>
+
+<p>Z kolei ten demon domyślnie nasłuchuje na porcie <b>1098</b>.</p>
+
+
+<li>Uruchamiamy kod <i>setup</i> z klasy serwera w celu zestawienia
+środowiska w którym ma działać serwer. Podajemy znaną opcję z nazwą
+pliku z opisem przyznanych uprawnień <b>java.policy</b>.
+Jako pierwszy parametr wywołania tym razem przekazujemy lokalizację
+skompilowanego kodu serwera. Drugim parametrem jest nazwa pod którą
+zarestrujemy się w <b>rmiregistry</b> (pamiętajmy aby przed tym
+poleceniem znów znaleźć się w katalogu z plikami serwera)
+
+<p class=command>
+java -Djava.rmi.server.codebase="http://artemis.wszib.edu.pl/~userlogin/"
+-Djava.security.policy=java.policy ActiveEchoServer
+http://artemis.wszib.edu.pl/~userlogin/ //komp0101/echoserver
+</p>
+
+
+<li>Uruchomienie klienta następuje w znany już sposób
+
+<p class=command>
+java -Djava.security.policy=java.policy EchoClient //komp0101/echoserver Hi
+</p>
+
+</ol></p>
+
+
+
+<hr>
+
+<i>Tomasz Gubała, Marek Kasztelnik</i>
+
+</body>
+</html>

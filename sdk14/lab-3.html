@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+
+<body>
+
+         
+<h1>RMI - ćwiczenie trzecie</h1>
+       
+<b>Dynamiczne ładowanie klas w RMI</b>
+
+
+<h2>Dlaczego?</h2>
+
+<p>Wprowadzeniem jest proste ćwiczenie oparte na przykładzie Echo z poprzednich
+zadań. Przed wykonaniem ćwiczenia w celu lepszej demonstracji przenieśmy pliki
+klienta Echo (<b>Echo.class</b> oraz <b>EchoClient.class</b>) do odrębnego
+katalogu tak, aby na pewno nie miał on dostępu do pliku <i>Stub</i> serwera.
+Następnie należy:
+
+<ol>
+  <li>Upewnić się, że zmienna środowiskowa <i>CLASSPATH</i> jest pusta (nie
+  istnieje)
+  <li>Uruchomić <b>rmiregistry</b> będąc w jakimkolwiek katalogu nie
+  zawierającym klasy <b>EchoServer_Stub.class</b>
+  <li>Przejść do katalogu w którym znajdują się pliki serwera i zarejestrować
+  go w rejestrze:
+  
+  <p class=command>
+java -Djava.security.policy=java.policy -Djava.rmi.server.codebase="file:`pwd`/"
+EchoServer echo123
+  </p>
+  
+  <li>W odrębnej konsoli przejść do katalogu gdzie przenieśliśmy pliki klienta
+  i uruchomić go w standardowy sposób:
+
+  <p class=command>
+java -Djava.security.policy=java.policy EchoClient echo123 Hi
+  </p>
+</ol>
+
+W wyniku tak przeprowadzonego ćwiczenia otrzymujamy wyjątek wynikający z
+braku prawa dostępu klienta do fizycznych plików serwera (w specyfikacji
+<b>java.policy</b> udostępnialiśmy jedynie połączenia na portach). Jest to
+tym bardziej zrozumiełe kiedy obie JVM działają na odrębnych maszynach.
+
+
+
+<h2>Użycie protokołu HTTP w celu dynamicznego pobrania klasy</h2>
+
+<p>Przeprowadzamy następujące kroki</p>
+<ol>
+  <li>Wygenerowany plik stuba <b>EchoServer_Stub.class</b> oraz skompilowany
+  interfejs <b>Echo.class</b> przemieszczamy do katalogu w którym może je
+  udostępnić Web Server (kopię pliku interfejsu warto zostawić także
+  w starym katalogu aby mógł ją znaleźć sam serwer)
+  
+  <p class=command>
+  cp EchoServer_Stub.class ~/../pub<br>
+  cp Echo.class ~/../pub<br>
+  </p>
+  
+  <li>Umożliwiamy publiczny dostęp do wspomnianych plików
+
+  <p class=command>
+  chmod a+r ~/../pub/*.class
+  </p>
+  
+  Teraz oba pliki powinny być dostępne poprzez protokół HTTP pod adresem
+  <b>http://artemis.wszib.edu.pl/~<i>userlogin</i>/</b>.
+</ol>
+
+
+<p> Teraz możemy powtórzyć poprzednie, nieudane ćwiczenie, przekazując
+odpowiedni parametr jako źródło plików klas:</p>
+
+<p class=command>
+java -Djava.rmi.server.codebase="http://artemis.wszib.edu.pl/~userlogin/"
+-Djava.security.policy=java.policy EchoServer //komp0404/echoserver
+</p>
+
+Po udanym zarejestrowaniu się serwera można sprawdzić jego działanie poprzez
+klienta Echo:</p>
+
+<p class=command>
+java -Djava.security.policy=java.policy  EchoClient //komp0404/echoserver Hello
+</p>
+
+ 
+<hr>
+
+<i>Tomasz Gubała</i>
+
+</body>
+</html>

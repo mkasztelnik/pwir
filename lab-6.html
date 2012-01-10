@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+
+<body>
+
+         
+<h1>RMI - ćwiczenie czwarte</h1>
+       
+<h2><i>Notification Server</i> - samodzielna implementacja aplikacji</h2>
+
+<p>Celem zadania jest stworzenie w technologii rozproszonej RMI serwera,
+który zbiera i magazynuje napływające doń informacje o zdarzeniach.
+Następnie, na żądanie, udostępnia owe informacje zarejestrowanym
+klientom.</p>
+
+<p>Przykładowa realizacja składa się z następujących elementów:
+<ul>
+  <li><b>Notification</b> - interfejs definiujący funkcjonalność serwera
+  <li><b>NotificationServer</b> - serwer aplikacji utrzymujący zbiór (kolejkę)
+  zdarzeń, dodający do tego zbioru nowe zdarzenia i udostępniający owe
+  zdarzenia klientom
+  <li><b>Event</b> - klasa opisująca pojedyncze zdarzenie, może zawierać
+  dowolnie wybrane pola czy metody (<font class=title>uwaga:</font> obiekty
+  tej klasy będą przekazywane poprzez zdalne połączenie RMI)
+  <li><b>EventGenerator</b> - typ klienta, który <i>tworzy</i> nowe
+  zdarzenia i rejestruje je w serwerze
+  <li><b>EventMonitor</b> - typ klienta, który pobiera instniejące zdarzenia
+  z serwera (i, dla przykładu, wypisuje je na <i>stdout</i>)
+</ul>
+</p>
+
+
+<h2>Wskazówki i pomysły</h2>
+
+<p>
+<ul>
+  <li>Można dobrać się w dwie osoby i podzielić pracą!
+  <li>Oba typy klientów mogą działać <i>jednorazowo</i> lub też w jakiegoś
+  rodzaju pętli (z udziałem człoweka lub bez)
+  <li>Klasa <b>Event</b> jest dobrym elementem do wykorzystania
+  polimorfizmu - można spróbować stworzyć podklasy charakteryzujące się
+  innym typem niesionej informacji (klasę bazową można uczynić abstrakcyjną
+  lub zamienić ją na interfejs)
+  <li>Serwer można wyposażyć w różne kolejki zdarzeń z różnymi nazwami
+  (tzw. <i>topic</i>) - wtedy monitory mogą pobierać tylko te zdarzenia,
+  którymi są zainteresowane
+  <li>W RMI łatwiej zaimplementować model powiadamiania typu <i>pull</i>
+  (klient sam zgłasza się po wiadomości) - spróbować zaimplementować także
+  model <i>push</i> (klient rejestruje się w serwerze jako zainteresowany i
+  jest automatycznie powiadamiany w chwili nadejścia wiadomości)
+  <li>Czasem warto rozbić funkcjonalność takiego serwera na dwie części
+  (osobno przyjmowanie i publikowanie zdarzeń) - dlaczego?
+</uL>
+</p>
+
+<p>Metody i obiekty które mogą się przydać:
+<ul>
+  <li>Thread.sleep(int) - uśpienie (w milisekundach)
+  <li>Calendar.getInstance().getTime() - czas
+  <li>Calendar.getInstance().getTimeInMillis() - czas w [ms]
+  <li>java.util - pakiet zawierający kolekcje obiektów
+  <li>System.in.read() - czytanie z strumienia wejściowego
+</ul>
+</p>
+         
+
+ 
+<hr>
+
+<i>Tomasz Gubała</i>
+
+</body>
+</html>

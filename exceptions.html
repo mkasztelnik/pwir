@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+<body>
+
+<h1>Krótki spis częstych wyjątków i ich typowych przyczyn</h1>
+
+<p class=command><b>
+java.security.AccessControlException: access denied
+(java.net.SocketPermission komp0404.dydaktyka.wszib.edu.pl resolve)<br>
+&nbsp;&nbsp;at java.security.AccessControlContext.checkPermission(AccessControlContext.java:269)<br>
+...
+</b></p>
+
+<p>JVM nie jest w stanie uzgodnić odpowiednich praw aby otworzyć zdalne
+połączenie. Możliwe przyczyny to brak ustawienia pliku z prawami
+(<b>java.policy</b>) w czasie uruchomienia lub w ogóle brak tego pliku
+w katalogu bieżącym gdzie jest program uruchamiany.</p>
+
+<hr>
+
+<p class=command><b>
+Echo exception: Connection refused to host: 145.100.42.21; nested exception is:<br>
+&nbsp;&nbsp;java.net.ConnectException: Connection refused<br>
+java.rmi.ConnectException: Connection refused to host: 145.100.42.21; nested exception is:<br>
+&nbsp;&nbsp;java.net.ConnectException: Connection refused<br>
+java.net.ConnectException: Connection refused<br>
+...
+</b></p>
+
+<p>Przyczyna może być dwojaka. Pierwsza możliwość: na wskazanym komputerze
+(tu: <b>145.100.42.21</b>) nie jest uruchomiony rejestr <b>rmiregistry</b>.
+Inny możliwy powód: obiekt, którego poszukujemy w rejestrze, jest w nim
+zarejestrowany pod podaną nazwą ale fizycznie już nie istnieje. Może się tak
+stać jeśli zarejestrujemy serwer (wywołaniem <b>Naming.(re)bind</b>) w rejestrze
+a następnie ów serwer wyłączymy.</p>
+
+<hr>
+
+<p class=command><b>
+java.rmi.NotBoundException: aplikacja<br>
+&nbsp;&nbsp;at sun.rmi.transport.StreamRemoteCall.exceptionReceivedFromServer(StreamRemoteCall.java:245)<br>
+&nbsp;&nbsp;at sun.rmi.transport.StreamRemoteCall.executeCall(StreamRemoteCall.java:220)<br>
+&nbsp;&nbsp;at sun.rmi.server.UnicastRef.invoke(UnicastRef.java:354)<br>
+...
+</b></p>
+
+<p>Ten wyjątek oznacza, że rejestr z którym chcieliśmy się połączyć działa pod
+podanym adresem, jednak nie ma w nim zarejestrowanego obiektu o podanej nazwie
+(tu: <b>aplikacja</b>).
+</p>
+
+<hr>
+
+<p class=command><b>
+Echo exception: error unmarshalling return; nested exception is:<br>
+&nbsp;&nbsp;java.lang.ClassNotFoundException: EchoServer_Stub<br>
+java.rmi.UnmarshalException: error unmarshalling return; nested exception is:<br>
+&nbsp;&nbsp;java.lang.ClassNotFoundException: EchoServer_Stub<br>
+&nbsp;&nbsp;at sun.rmi.registry.RegistryImpl_Stub.lookup(Unknown Source)<br>
+...
+</b></p>
+
+<p>Rejestr zgłasza problem z dostępem do klasy <b>EchoServer_Stub</b>.
+Proste (niedobre) rozwiązanie: uruchomić rejestr w ten sposób aby posiadał
+plik <b>EchoServer_Stub.class</b> w ścieżce <i>CLASSPATH</i> (automatycznie
+tak się dzieje jeżeli uruchomimy rejestr w tym samym katalogu). Rozwiązaniem
+lepszym jest przekazanie lokalizacji tego pliku w chwili uruchamiania
+serwera opcją <b>-Djava.rmi.server.codebase=URL</b>.
+</p>
+
+<hr>
+
+<p class=command><b>
+Echo exception: error unmarshalling return; nested exception is:<br>
+&nbsp;&nbsp;java.lang.ClassNotFoundException: access to class loader denied<br>
+java.rmi.UnmarshalException: error unmarshalling return; nested exception is:<br>
+&nbsp;&nbsp;java.lang.ClassNotFoundException: access to class loader denied<br>
+&nbsp;&nbsp;at sun.rmi.registry.RegistryImpl_Stub.lookup(Unknown Source)<br>
+...
+</b></p>
+
+<p>Wyjątek ten najczęściej pojawia się kiedy klient próbuje wyszukać
+serwer w rejestrze i zdobyć jego <i>stub</i> w celu wywołania metody. Można
+temu zaradzić ustawiając parametr <b>-cp</b> wywołania klienta (ścieżka
+<i>classpath</i>) tak aby zawierał m.in. ścieżkę dostępu do klasy <i>stub</i>
+serwera (np. <b>EchoServer_Stub.class</b>). W sytuacji ogólnej, kiedy klient
+nie ma bezpośredniego dostępu do tej klasy należy ją przekazać dynamicznie
+(poprzez protokół HTTP) przy pomocy ustawienia parametru
+<b>-Djava.rmi.server.codebase=URL</b> przy uruchamianiu klienta - wymaga to
+jednak udostępnienia pliku <b>EchoServer_Stub.class</b> poprzez serwer Web.
+</p>
+
+<hr>
+
+<p class=command><b>
+java.rmi.server.ExportException: Port already in use: 1099; nested exception is:<br>
+&nbsp;&nbsp;java.net.BindException: Address already in use<br>
+java.net.BindException: Address already in use<br>
+...
+</b></p>
+
+<p>Wyjątek ten może się pojawić podczas uruchamiania rejestru <b>rmiregistry</b>.
+Oznacza, że port <b>1099</b> jest już używany przez inny program na tej maszynie.
+Zazwyczaj chodzi tu o inny, wcześniej uruchomiony i nie zakończony rejestr
+<b>rmiregistry</b>.
+</p>
+
+<hr>
+
+<p class=command><b>
+java.rmi.AccessException: Registry.Registry.rebind disallowed; origin e21.blue.sara.nl/145.100.42.21 is non-local host<br>
+java.rmi.ServerException: RemoteException occurred in server thread; nested exception is:<br>
+&nbsp;&nbsp;java.rmi.AccessException: Registry.Registry.rebind disallowed; origin e21.blue.sara.nl/145.100.42.21 is non-local host<br>
+...        
+</b></p>
+
+<p>Nie można zarejestrować w <b>rmiregistry</b> serwera znajdującego się
+na innej maszynie niż lokalna. Jest to umyślne ograniczenie narzucone przez
+twórców RMI.
+</p>
+
+<hr>
+
+<p class=command><b>
+java.rmi.AlreadyBoundException: echo123<br>
+&nbsp;&nbsp;at sun.rmi.registry.RegistryImpl.bind(RegistryImpl.java:123)<br>
+&nbsp;&nbsp;at sun.rmi.registry.RegistryImpl_Skel.dispatch(Unknown Source)<br>
+...
+</b></p>
+
+<p>Obiekt próbuje zarejestrować się metodą <b>bind()</b> pod nazwą używaną
+już obecnie przez inny obiekt (serwer) - tu: <b>echo123</b>. Należy albo
+zmienić proponowaną nazwę albo użyć metody <b>rebind()</b> - ta druga opcja
+spowoduje jednoczesne wyrejestrowanie poprzedniego serwera z rejestru.
+<font class=title>Uwaga!</font> Samo zakończenie działania przez poprzedni
+serwer nie zwalnia użytej przezeń nazwy w rejestrze. Dopiero bezpośrednie
+wywołanie metody <b>unbind()</b> rejestru zwolni używaną nazwę.
+</P>
+
+<hr>
+
+<i>Tomasz Gubała</i>
+
+</body>
+</html>

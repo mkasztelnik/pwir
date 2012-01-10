@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Programowanie rozproszone w Javie - technologia RMI</title>
+</head>
+
+
+<body>
+
+<h1>RMI - ćwiczenie drugie</h1>
+
+<b>Uruchomienie przykładu Echo na dwóch komputerach</b>
+
+<p>Do ćwiczenia potrzebne są dwa komputery podłączone do sieci. Ćwiczenie jest
+dwuosobowe.</p>
+<ol>
+  <!-- <li>Przy pomocy polecenia <tt>/sbin/ifconfig</tt> znajdujemy numery IP
+komputerów.</li>-->
+  <li>Przy pomocy polecenia <b>hostname</b> znajdujemy nazwy domenowe obu
+  komputerów (jeżeli obie domeny są takie same jako nazwy maszyn wystarczy użyć
+  samej nazwy hosta)
+  <li>Na komputerze A uruchamiamy Naming Service poleceniem <b>rmiregistry</b>  
+  <li>Na komputerze A uruchamiamy serwer <!--(np. EchoSerwer) w ten sposób, żeby
+rejestrował się w Naming Service przy użyciu URL zawierającego nazwę komputera
+A. Dokonujemy tego dodajac dodatkowy parametr uruchomieniony servera 
+<font class="title">-Djava.rmi.server.codebase</font> 
+(np. <b>-Djava.rmi.server.codebase=komp0401.dydaktyka.wszib.edu.pl</b>).--> 
+</li>
+  <li>Na komputerze B uruchamiamy klienta w ten sposób, by szukał referencji
+do obiektu serwera przy pomocy URL z numerem IP komputera A (uzyskanym dzieki punktowi nr. 1). W ten sposób klient na komputerze B wywoła metodę obiektu znajdującego
+się na komputerze A.</li>
+</ol>
+<!-- Uwaga: Używanie numerów IP zamiast nazw jest konieczne ponieważ (prawie)
+wszystkie komputery w laboratorium mają nazwę <tt>localhost.localdomain</tt>
+i nie da się ich rozróżnić po tej nazwie.-->
+
+
+
+<i>Tomasz Gubała, Marek Kasztelnik</i>
+
+</body>
+</html>

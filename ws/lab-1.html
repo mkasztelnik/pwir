@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../style.css">
+<title>Programowanie rozproszone w Javie - technologia WS</title>
+</head>
+
+
+<body>
+
+<h1>WS - ćwiczenie pierwsze</h1>
+
+<B>Korzystanie z Usług Sieciowych przy pomocy protokołu SOAP</b>
+
+<p>Celem tego podstawowego ćwiczenia jest zrozumienie działania ustług internetowych (Web Service) i implementacja prostych aplikacji, które są w stanie użyć dostępnie dostępnych <i>Web Serviców</i>. Poszczególne punkty tłumaczą jak przetestować przykładowy serwis oraz jak stworzyć aplikacje umożliwiające wywołanie udostępnionych usług w kilkku językach programowania.</p>
+
+
+<p>Poniższe ćwiczenie wykorzystuje JDK 1.6.</p>
+
+<h2>Wywołanie aplikacji używającej stylu RPC</h2>
+
+<font class=title>Uwaga:</font> styl RPC jest uważany za przestarzały i nie wspierany przez JAXWS 2.0, dlatego do wykonania tej części ćwiczeń będziemy używać przestarzałej biblioteki <a href="http://xml.apache.org/axis">AXIS</a>. 
+
+<p>
+Celem ćwiczenia jest wywołanie usługi udostępnionej przez <a href="http://www.stgregorioschurchdc.org/">Koścół Św. Gregoriosa</a>.  Podaje ona date Świąt Wielkanocnych w zadanym roku.
+</p>
+
+Wykonać tą usługę można wykorzystujac pakiet <a href="http://www.soapui.org/">SoupUI</a> (używając tego pakietu można zobaczyć tam komunikaty SOAP). 
+
+<p>
+Biblioteka AXIS zainstalowana jest w katalogu:
+</p>
+<p class=command>
+/afs/wszib/usr/t/s/tszepie/pub/prir/axis-1_4
+</p>
+
+Aby z niej móc korzystać, należy dopisać do CLASSPATH wszystkie pliki JAR znajdujące się w dystrybucji AXIS. Robimy to skryptem <a href="src/axissetup.sh">axissetup.sh</a>.
+<p class=command>
+. axissetup.sh
+</p>
+
+Do tworzenia klienta skorzystamy z opisu usługi, dostępnej w pliku WSDL dostępnym pod adresem: <a href="http://www.stgregorioschurchdc.org/wsdl/Calendar.wsdl">http://www.stgregorioschurchdc.org/wsdl/Calendar.wsdl</a>. Wszystkie potrzebne pliki wygenerujemy narzędziem WSDL2Java dostępnym w AXIS:
+
+<p class="command">java org.apache.axis.wsdl.WSDL2Java http://www.stgregorioschurchdc.org/wsdl/Calendar.wsdl</p>
+
+Wygeneruje nam to pliki:
+
+<ul>
+  <li>org/stgregorioschurchdc/www/Calendar/Calendar.java</li>
+  <li>org/stgregorioschurchdc/www/Calendar/CalendarLocator.java</li>
+  <li>org/stgregorioschurchdc/www/Calendar/EasterDateSoapBindingStub.java</li>
+  <li>org/stgregorioschurchdc/www/Calendar/EasterDateSoapPort.java</li>
+</ul>
+
+Klienta musimy napisać sami. Na początku deklarujemy korzystanie z utworzonych plików:
+
+<p class="command">
+import org.stgregorioschurchdc.www.Calendar.*;
+</p>
+
+Następnie w funkcji main()
+
+<p class="command">
+try {<br />
+&nbsp;&nbsp;//tworzymy referencje do usługi<br />
+&nbsp;&nbsp;Calendar calendar = new CalendarLocator();<br />
+<br />
+&nbsp;&nbsp;//pobieramy port SOAPowy<br />
+&nbsp;&nbsp;EasterDateSoapPort port = calendar.getEasterDateSoapPort();<br />
+<br />
+&nbsp;&nbsp;//wywolujemy zdalnie funkcję usługi<br />
+&nbsp;&nbsp;System.out.println(port.easter_date(Short.parseShort(args[0])));<br />
+<br />
+} catch (Exception e) {<br />
+&nbsp;&nbsp;System.err.println("App exception: " + e.getMessage());<br />
+&nbsp;&nbsp;e.printStackTrace();<br />
+}<br />
+</p>
+
+Gotowy <a href="src/Client.java">Client.java</a>. Kompilujemy utworzony plik:
+
+<p class="command">
+javac Client.java
+</p>
+
+Uruchamiamy klienta pytając o Wielkanoc w roku 2012:
+
+<p class="command">
+java Client 2012
+</p>
+
+Dostajemy odpowiedź:
+
+<p class="command">
+2012/04/08
+</p>
+
+<h2>Wywołanie aplikacji używającej stylu Document</h2>
+
+Styl Document jest standardem obslugiwanym przez standard JAXWS 2.0 implementowany przez JDK 1.6, przez co tworzenie klienta jest znacznie uproszczone. W trakcie tego ćwiczenia wywołamy jedną z metod dostarczanych przez serwis dostępny pod adresem: <a href="http://www.holidaywebservice.com/Holidays/GBSCT/Dates/GBSCTHolidayDates.asmx?WSDL">http://www.holidaywebservice.com/Holidays/GBSCT/Dates/GBSCTHolidayDates.asmx?WSDL</a>. Umożliwia on pobranie dat świąt narodowych Szkocji. Opis funkcji udostępnianych przez ten status jak i status dostępności serwisu może być monitorowany na tej stronie: <a href="http://webservices.seekda.com/providers/holidaywebservice.com/GBSCTHolidayDates">http://webservices.seekda.com/providers/holidaywebservice.com/GBSCTHolidayDates</a>. W celu wygenerowania klas niezebędnych do stworzenia klenta serwisu należy wywołać następującą komende:
+
+<p class="command">
+wsimport -p client http://www.holidaywebservice.com/Holidays/GBSCT/Dates/GBSCTHolidayDates.asmx?WSDL
+</p>
+
+A następnie stworzyć klase klienta:
+
+<p class="command">
+package client;<br />
+<br />
+public class Client {<br />
+<br />
+&nbsp;&nbsp;public static void main(String[] args) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GBSCTHolidayDates service = new GBSCTHolidayDates();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GBSCTHolidayDatesSoap proxy = service.getGBSCTHolidayDatesSoap();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(proxy.getHalloween(2011));<br />
+&nbsp;&nbsp;}<br />
+}<br />
+</p>
+
+<p><font class=title>Uwaga:</font> klasa klienta musi znajdować sie w katalogu client.</p>
+Następnie kompilujęmy stworzoną aplikację:
+
+<p class="command">
+javac client/*.java
+</p>
+
+A następnie uruchamiamy aplikację:
+
+<p class="command">
+java client.Client
+</p>
+
+Jako rezultat uzyskujemy datę hallowin w roku 2011
+
+<p class="command">
+2011-10-31T00:00:00
+</p>
+
+<h2>Klient w Perlu</h2>
+
+Perl jest językiem skryptowym, używanym do przetwarzania plików tekstowych, również w skryptach CGI. Istnieje wygodny moduł o nazwie <a href="http://www.soaplite.com/">SOAP::Lite</a>,  służacy do obsługi Usług Sieciowych (Web Services). Progam client.pl w perlu korzystający z tej samej usługi podającej datę wielkanocy będzie miał postać:
+
+<p class="command">
+use SOAP::Lite;<br />
+<br />
+&nbsp;print SOAP::Lite->service('http://www.stgregorioschurchdc.org/wsdl/Calendar.wsdl')<br />
+&nbsp;&nbsp;-> easter_date(@ARGV[0]);<br />
+&nbsp;print "\n"<br />
+</p>
+Program ten uruchamiamy perlem (w jednej lini!), podając ścieżkę do biblioteki SOAP::Lite:
+
+<p class="command">
+perl -I /afs/wszib/usr/t/s/tszepie/pub/prir/SOAP-Lite-0.69/lib/ client.pl 2008 
+</p>
+<hr>
+
+<i>Marek Kasztelnik, Maciej Malawski, Marcin Radecki, Tomasz Szepieniec </i>
+
+</body>
+</html>
