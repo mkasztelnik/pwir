@@ -1,0 +1,2 @@
+RewriteRule ^.git.*$ - [F]
+RewriteRule ^data.*$ - [F]
