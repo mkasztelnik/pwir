@@ -23,7 +23,13 @@
 
 Biblioteka <a href="http://http://cxf.apache.org/">CXF</a> jest aktualnie jednym z najbardziej rozwiniętych projektów wspierających Web Serwisy (oraz Rest Serwisy). Wykorzystamy ją do stworzenia prostego web serwisu, którego zainstalujemy w kontenerze <a href="http://tomcat.apache.org/">tomcat</a>.
 
-W celu uproszczenia zarządzaniem zależnościami niezbędnymi do użycia biblioteki CXF wykorzystamy narzędzie <a href="http://maven.apache.org/">maven</a>. Pozwala on zarządzać całym cyklem życia aplikacji javowej, począwszy od stworzenia projetku, przez zarządzaniem jego zależnościami do budowania finalnego produktu, gotowego do wdrożenia na produkcji.
+W celu uproszczenia zarządzaniem zależnościami niezbędnymi do użycia biblioteki CXF wykorzystamy narzędzie <a href="http://maven.apache.org/">maven</a>. Pozwala on zarządzać całym cyklem życia aplikacji javowej, począwszy od stworzenia projetku, przez zarządzaniem jego zależnościami do budowania finalnego produktu, gotowego do wdrożenia na produkcji. Na samym początku musimy skonfigurowac mavena. W celu uproszczenia tego procesu prosze ściągnąć sobie następujący plik konfiguracyjny: <a href="scr/mvnsetup.sh">mvnsetup.sh</a> który ustawia nam odpowiednią zmienną środowiskową:
+
+<p class="command">
+. mvnsetup.sh
+</p>
+
+Następnie generujemy projekt z uzyciem narzędzia maven:
 
 <p class="command">
 mvn archetype:generate -B -DarchetypeGroupId=org.apache.cxf.archetype -DarchetypeArtifactId=cxf-jaxws-javafirst -DarchetypeVersion=2.5.1 -DgroupId=pl.edu.wszib -DartifactId=first-cxf-ws -Dversion=1.0 -Dpackage=pl.edu.wszib.pwir
