@@ -35,7 +35,18 @@ Następnie generujemy projekt z uzyciem narzędzia maven:
 mvn archetype:generate -B -DarchetypeGroupId=org.apache.cxf.archetype -DarchetypeArtifactId=cxf-jaxws-javafirst -DarchetypeVersion=2.5.1 -DgroupId=pl.edu.wszib -DartifactId=first-cxf-ws -Dversion=1.0 -Dpackage=pl.edu.wszib.pwir
 </p>
 
-W rezultacie zostanie stworzony calkowicie działająca aplikacja udostępniająca prosty web serwis. 
+W rezultacie zostanie stworzony calkowicie działająca aplikacja udostępniająca prosty web serwis. Archetype standardowo ustawia nam zalezność do javy 1.5, zmieńmy tą wartość na 1.6. W tym celu proszę otworzyć plik pom.xml a następnie zmienić wartość wersji javy:
+
+<pre class="command">
+&lt;plugin&gt;
+  &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+  &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+  &lt;configuration&gt;
+    &lt;source&gt;1.6&lt;/source&gt;
+    &lt;target&gt;1.6&lt;/target&gt;
+  &lt;/configuration&gt;
+&lt;/plugin&gt;
+</pre>
 
 Ten projekt może zostać bardzo łatwo zaimportowany do środowiska <a href="http://www.eclipse.org/">Eclipse</a>
 <p class="command">
