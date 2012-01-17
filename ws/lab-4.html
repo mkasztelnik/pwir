@@ -12,60 +12,43 @@
 
 <h1>WS - ćwiczenie czwarte</h1>
 
-<B>Serwisy XML-RPC</b>
+<B>Przesyłanie własnych struktur danych</b>
 
-<p>Celem tego ćwiczenia jest stworzenie serwera oraz klienta rozmawiających ze sobą z wykorzytaniem XML-RPC.</p>
+<p>Celem tego ćwiczenia jest stworzenie web serwisu używającego własnych struktur danych.</p>
 
 
 <p>Poniższe ćwiczenie wykorzystuje JDK 1.6.</p>
 
-<h2>Stworzenie serwera</h2>
+<h2>Zadanie</h2>
 
-Format wiadomosci przesylanych przez klienta do serwera:
+Proszę stworzyć nowy serwis WS, który przesyła swoje struktury danych. Nowa struktura danych musi zostać stworzona jako bean. Bean charakteryzuje się tym, iż posiada prywatne pola oraz tak zwane settery oraz gettery. Przykładowy bean został pokazany poniżej:
+
 <pre class="command">
-&#60;methodCall&#62;
-  &#60;methodName&#62;sample.sumAndDifference&#60;/methodName&#62;
-  &#60;params&#62;
-    &#60;param&#62;&#60;value&#62;&#60;int&#62;5&#60;/int&#62;&#60;/value&#62;&#60;/param&#62;
-    &#60;param&#62;&#60;value&#62;&#60;int&#62;3&#60;/int&#62;&#60;/value&#62;&#60;/param&#62;
-  &#60;/params&#62;
-&#60;/methodCall&#62;
+package pl.edu.wszib.pwir;
+
+public class User {
+
+	private String username;
+	
+	private String password;
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+}
 </pre>
-
-
-Format odpowiedzi serwera:
-<pre class="command">
-&lt;methodResponse&gt;
-   &lt;params&gt;
-      &lt;param&gt;
-         &lt;value&gt;&lt;string&gt;Text&lt;/string&gt;&lt;/value&gt;
-      &lt;/param&gt;
-   &lt;/params&gt;
-&lt;/methodResponse&gt;
-</pre>
-
-Prosze porownac z przykladowymi komunikatami przesylanymi za pomoca SOAP.
-
-<h3>Serwer i klient XML-RPC w Pythonie</h3>
-<ol><li>Napisac prosty program serwera XML-RPC w jezyku Python, korzystajac z wbudowanej biblioteki xmlrpclib. Na podstawie <a href=http://docs.python.org/library/xmlrpclib.html>instrukcji</a>.</li>
-<li>Serwer uruchamia sie poleceniem:
-<pre>python server.py</pre>
-
-Zatrzymac mozna uzywajac Ctrl+C
-</li>
-<li>Napisac kod klienta wywolujacy zarejestrowana metode serwera</li>
-<li>Klienta uruchamia sie poleceniem:
-<pre>python client.py</pre>
-</li>
-</ol>
-<h3>Klient XML-RPC w Rubym</h3>
-<ol>
-<li>Napisac kod klienta wywolujacy zarejestrowana metode serwera (napisanego w Pythonie), korzystajac z wbudowanej bilibioteki xmlrpc. Na podstawie <a href=http://www.tldp.org/HOWTO/XML-RPC-HOWTO/xmlrpc-howto-ruby.html#xmlrpc-howto-ruby-client>instrukcji</a>.</li>
-<li>Klienta uruchamia sie poleceniem:
-
-<pre>ruby client.rb</pre>
-</li>
-</ol>
 
 <hr />
 
