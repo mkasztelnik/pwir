@@ -12,60 +12,15 @@
 
 <h1>WS - ćwiczenie czwarte</h1>
 
-<B>Serwisy XML-RPC</b>
+<B>Web Serwisy w innych językach programowania</b>
 
-<p>Celem tego ćwiczenia jest stworzenie serwera oraz klienta rozmawiających ze sobą z wykorzytaniem XML-RPC.</p>
-
-
-<p>Poniższe ćwiczenie wykorzystuje JDK 1.6.</p>
-
-<h2>Stworzenie serwera</h2>
-
-Format wiadomosci przesylanych przez klienta do serwera:
-<pre class="command">
-&#60;methodCall&#62;
-  &#60;methodName&#62;sample.sumAndDifference&#60;/methodName&#62;
-  &#60;params&#62;
-    &#60;param&#62;&#60;value&#62;&#60;int&#62;5&#60;/int&#62;&#60;/value&#62;&#60;/param&#62;
-    &#60;param&#62;&#60;value&#62;&#60;int&#62;3&#60;/int&#62;&#60;/value&#62;&#60;/param&#62;
-  &#60;/params&#62;
-&#60;/methodCall&#62;
-</pre>
+<p>Celem tego ćwiczenia jest własnoręczne stworzenie serwera oraz klienta web serwisu w ulubionym języku programowania.</p>
 
 
-Format odpowiedzi serwera:
-<pre class="command">
-&lt;methodResponse&gt;
-   &lt;params&gt;
-      &lt;param&gt;
-         &lt;value&gt;&lt;string&gt;Text&lt;/string&gt;&lt;/value&gt;
-      &lt;/param&gt;
-   &lt;/params&gt;
-&lt;/methodResponse&gt;
-</pre>
 
-Prosze porownac z przykladowymi komunikatami przesylanymi za pomoca SOAP.
+<h2>Zadanie</h2>
 
-<h3>Serwer i klient XML-RPC w Pythonie</h3>
-<ol><li>Napisac prosty program serwera XML-RPC w jezyku Python, korzystajac z wbudowanej biblioteki xmlrpclib. Na podstawie <a href=http://docs.python.org/library/xmlrpclib.html>instrukcji</a>.</li>
-<li>Serwer uruchamia sie poleceniem:
-<pre>python server.py</pre>
-
-Zatrzymac mozna uzywajac Ctrl+C
-</li>
-<li>Napisac kod klienta wywolujacy zarejestrowana metode serwera</li>
-<li>Klienta uruchamia sie poleceniem:
-<pre>python client.py</pre>
-</li>
-</ol>
-<h3>Klient XML-RPC w Rubym</h3>
-<ol>
-<li>Napisac kod klienta wywolujacy zarejestrowana metode serwera (napisanego w Pythonie), korzystajac z wbudowanej bilibioteki xmlrpc. Na podstawie <a href=http://www.tldp.org/HOWTO/XML-RPC-HOWTO/xmlrpc-howto-ruby.html#xmlrpc-howto-ruby-client>instrukcji</a>.</li>
-<li>Klienta uruchamia sie poleceniem:
-
-<pre>ruby client.rb</pre>
-</li>
-</ol>
+Proszę znaleść informacje, jak stworzyć Web Serwice w innym języku programowania niż Java. Zadanie można wykonać w parach.
 
 <hr />
 
