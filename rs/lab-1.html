@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../style.css">
+<title>Programowanie rozproszone w Javie - technologia REST</title>
+</head>
+
+
+<body>
+
+<h1>RS - ćwiczenie pierwsze</h1>
+
+<B>Stworzenie prostej usługi w technologii REST</b>
+
+<p>Poniższe ćwiczenie wykorzystuje język programowania <a href="ruby-lang.org">Ruby</a> oraz biblioteke <a href="http://www.sinatrarb.com/">sinatra</a>.</p>
+
+Serwisy RESTowe zakładają cztery postawowe operacje:
+<ul>
+  <li>GET - pobieranie wartosci zaobu dostępnego pod określoną ścieżką (e.g. http://myhost/author/marek)</li>
+  <li>POST - stworzenie bądz edycja zasobu (e.g. http://myhost/author/new, http://myhost/author/marek/edit)</li>
+  <li>PUT - storzenie zaosbu pod określoną ścieżką (e.g. http://myhost/author/kuba)</li>
+  <li>DELETE - skasowanie zasobu znajdującego się pod podaną ścieżką (e.g. http://myhost/author/marek)</li>
+</ul>
+
+Biblioteka <a href="http://www.sinatrarb.com/">sinatra</a> jest swoistym DSLem (Domain Specific Language) ułatwiającym tworzenie serwisów restowych. Poniżej został przedstawiony najprostrzy przykład wykorzystania tej biblioteki. Celem zadania jest stowrzenie zestawu serwisów restowych umożliwiających zarządzaniem biblioteki. Serwisy restowe powinny umożliwiać dodawnie/edycje/usówanie autorów oraz napisanych przez nich książek.
+
+<pre class="code">
+require 'rubygems'
+require 'sinatra'
+
+get '/hi' do
+    "Hello World!"
+end
+
+get '/hello/:name' do
+    # matches "GET /hello/foo" and "GET /hello/bar"
+    # params[:name] is 'foo' or 'bar'
+    "Hello #{params[:name]}!"
+end
+</pre>
+
+Uruchomienie aplikacji w ruby
+
+<pre class="code">
+ruby hi.rb
+</pre>
+
+<p>
+Do testowania stworzonych serwisów restowych można wykorzystać zarówno przeglądarke (wywolania typu GET) lub biblioteke curl. Poniżej można znaleść kilka przykładów użycia tej biblioteki:
+<ul>
+<li>GET: curl http://myhost/author/marek</li>
+<li>POST: curl -X POST -d "message body" http://myhost/author/new</li>
+<li>PUT: curl -X PUT -d "message body" http://myhost/author/marek</li>
+<li>DELETE: curl -X DELETE http://myhost/author/marek</li>
+</ul>
+</p>
+
+<hr />
+
+<i>Marek Kasztelnik</i>
+
+</body>
+</html>
