@@ -10,16 +10,16 @@
 
 <body>
 
-         
+
 <h1>RMI - ćwiczenie trzecie</h1>
-       
+
 <h2>Przykład aplikacji  - serwer z modułami typu <i>plug-in</i></h2>
 
 <p>Przykładem ciekawszej aplikacji wykorzystującej RMI oraz dynamiczne
 ładowanie kodu jest serwer, do którego można dynamicznie ładować
 <i>pluginy</i> i wykonywać w nich obliczenia na wirtualnej maszynie serwera.</p>
 
-         
+
 <h2>Interfejs Serializable</h2>
 
 <p>Do tej pory korzystaliśmy z interfejsu <font class=title>java.rmi.Remote</font>,
@@ -35,16 +35,16 @@ jest kopiowana, serializowana (<i>marshalling</i>) i przesyłana przez sieć do
 obiektu, który implementuje metodę (do serwera).
 </p>
 
-<p>Jeżeli parametrem zdalnej metody jest nie klasa, lecz interfejs, wówczas 
-wirtualna maszyna, na której znajduje się serwer, nie musi wcześniej znać 
-definicji obiektu, który otrzyma w czasie działania od klienta. Wystarczy 
+<p>Jeżeli parametrem zdalnej metody jest nie klasa, lecz interfejs, wówczas
+wirtualna maszyna, na której znajduje się serwer, nie musi wcześniej znać
+definicji obiektu, który otrzyma w czasie działania od klienta. Wystarczy
 tylko, że obiekt ten implementuje znany interfejs. Oznacza to, że pliki
 <b>.class</b> tego obiektu mogą nie być dostępne w momencie uruchomienia
 serwera. Żeby klient mógł przekazać obiekt nie znany wcześniej w wirtualnej
 maszynie serwera, musi on podać lokalizację, skąd można definicję obiektu
 pobrać. W tym celu ponownie używamy opcji
 </p>
-     
+
 <p class=command>java.rmi.server.codebase=&lt;URL&gt;</p>
 
 Gdzie <b>&lt;URL&gt;</b> wskazuje na miejsce, z którego można pobrać pliki
@@ -58,7 +58,7 @@ pliki poprzez sieć.
 <a href="plugin.gif">Prosty diagram klas aplikacji.</a>
 
 <p>Potrzebne będą następujące pliki
-   
+
 <ul>
 <!--    <li><a href="src/plug/AppContainer.java"><b>AppContainer.java</b></a>
     - definicja interfejsu serwera - kontenera dla pluginów
@@ -95,7 +95,7 @@ pliki poprzez sieć.
 	<li>W metodzie <b>run</B> wywołać metodę <b>compute</b> otrzymanego
 	Pluginu i wynik jej działania zwrócić klientowi
 </ol></p>
-	
+
 
 <p>Pliki należy skompilować <!--i utworzyć <i>stub</i> dla klasy
 <b>AppServer</b>.--></p>
@@ -105,9 +105,9 @@ pliki poprzez sieć.
 <h2>Uruchomienie przykładu</h2>
 
 <p>Należy przetestować działanie programów na dwóch różnych komputerach.
-   
+
 <ol>
-<li>Na komputerze A działa <b>rmiregistry</b> oraz w osobnym katalogu 
+<li>Na komputerze A działa <b>rmiregistry</b> oraz w osobnym katalogu
 znajdują się pliki serwera:
       <ul>
       <li><b>AppContainer.class</b>
@@ -117,24 +117,24 @@ znajdują się pliki serwera:
       <li><b>Plugin.class</b>
       </ul>
 
-<li>Pliki 
+<li>Pliki
 	<ul>
 <!--	<li><b>AppServer_Stub.class</b>-->
 	<li><b>Plugin.class</b>
 	<li><b>AppContainer.class</b>
 	</ul>
 należy umieścić w katalogu <b>~/../pub/server_classes</b>
-i ustawić odpowiednie prawa dostępu (chmod a+r *). Wówczas <i>codebase</i> dla 
+i ustawić odpowiednie prawa dostępu (chmod a+r *). Wówczas <i>codebase</i> dla
 serwera będzie mieć postać:
 <b>http://artemis.wszib.edu.pl/~userA/server_classes</b>
 
 <li>Należy uruchomić serwer na komputerze A poleceniem
 
 <p class=command>
-java -Djava.rmi.server.codebase="http://artemis.wszib.edu.pl/~userA/server_classes/"
+java -Djava.rmi.server.useCodebaseOnly=false -Djava.rmi.server.codebase="http://artemis.wszib.edu.pl/~userA/server_classes/"
 -Djava.security.policy=java.policy AppServer appserver
 </p>
-gdzie <b>hostA</b> to nazwa domenowa komputera A
+gdzie <b>hostA</b> to nazwa domenowa komputera A. Flaga <font class=title>-Djava.rmi.server.useCodebaseOnly=false</font> jest niezbędna ze względu na zmianę wprowadzoną w JDK7, począwszy od JDK7 Update 21. Więcej informacji można znaleść pod następującym <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/rmi/enhancements-7.html">adresem</a>.
 
 <li>Na komputerze B muszą być pliki klienta
 	<ul>
@@ -144,7 +144,7 @@ gdzie <b>hostA</b> to nazwa domenowa komputera A
 	<li><b>Plugin.class</b>
 	<li><b>java.policy</b>
 	</ul>
-	
+
 <li> Plik <b>FibPlugin.class</b> należy umieścić w katalogu
 <b>~/../pub/client_classes</b> i ustawić odpowiednie prawa dostępu.
 Wówczas <i>codebase</i> dla klienta będzie mieć postać
@@ -156,7 +156,7 @@ java -Djava.rmi.server.codebase="http://artemis.wszib.edu.pl/~userB/client_class
 -Djava.security.policy=java.policy AppClient hostA appserver 8
 </p>
 To polecenie powinno zwrócić ósmy wyraz ciągu Fibonacciego.
-   
+
 </ol>
 
 
@@ -165,10 +165,10 @@ Proszę wymyślić i napisać nowy plugin do tego serwera, który będzie
 wykonywał inną operację niż <b>FibPlugin</b>. Ile plików trzeba
 zmienić i rekompilować?<br>
 
- 
+
 <hr>
 
-<i>Tomasz Gubała</i>
+<i>Tomasz Gubała, Marek Kasztelnik</i>
 
 </body>
 </html>
